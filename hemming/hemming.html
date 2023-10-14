@@ -1,0 +1,71 @@
+<html>
+	<head>
+		<title> my Hemming code </title>
+		<script>
+			function code(){
+				let inpText = document.getElementById('inpMessage').value; //получаем на вход сообщение
+				inpText = inpText.split(''); //делим сообщение посимвольно
+				for (let i = 0; i < inpText.length; i++){
+					inpText[i] = parseInt(inpText[i]); //переводим каждый символ сообщения в число
+				}
+				let controlBit1 = (inpText[0] + inpText[1] + inpText[3])%2; //получаем первый контрольный бит
+				let controlBit2 = (inpText[1] + inpText[2] + inpText[3])%2; //получаем второй контрольный бит
+				let controlBit3 = (inpText[0] + inpText[2] + inpText[3])%2; //получаем третий контрольный бит
+				document.getElementById('outMessage').value = inpText.join('') + controlBit1 + controlBit2 + controlBit3; //выводим сообщение с контрольными символами
+			}
+			function decode(){
+				let errorIn = 0; //переменная для расчета того, в каком символе ошибка
+				let outText = document.getElementById('outMessage').value; //получаем сообщение, которое нужно проверить на ошибки
+				outText = outText.split(''); //делим сообщение посимвольно
+				for (let i = 0; i < outText.length; i++){
+					outText[i] = parseInt(outText[i]); //переводим каждый символ сообщения в число
+				}
+				if ((outText[0] + outText[1] + outText[3])%2 != outText[4]) errorIn += 2; //если с контрольным битом не сходятся его символы прибавляем его значение (в данном случае я выбрала 2 для однозначного расчета) в переменную для расчета
+				if ((outText[1] + outText[2] + outText[3])%2 != outText[5]) errorIn += 3; //если с контрольным битом не сходятся его символы прибавляем его значение (в данном случае я выбрала 3 для однозначного расчета) в переменную для расчета
+				if ((outText[0] + outText[2] + outText[3])%2 != outText[6]) errorIn += 4 //если с контрольным битом не сходятся его символы прибавляем его значение (в данном случае я выбрала 4 для однозначного расчета) в переменную для расчета
+				if (errorIn == 0){ //если ошибки не было
+					document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '' + outText[2] + '' + outText[3]; //выводим первые четыре символа сообщения
+					document.getElementById('placeHolder').innerText = 'no errors'; //пишем что ошибок не было
+					return; //выходим из функции
+				}
+				for (let i = 2; i < 5; i++){ //если ошибка в контрольном бите
+					if (errorIn == i){
+						document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '' + outText[2] + '' + outText[3]; //выводим первые четыре символа сообщения
+						document.getElementById('placeHolder').innerText = 'error in position ' + (i+3); //пишем в котором символе была ошибка
+						return; //выходим из функции
+					}
+				}
+				if (errorIn == 5){ //если ошибка была во втором символе сообщения
+					if (outText[1]){ //если символ стал 1
+						document.getElementById('origMessage').value = outText[0] + '0' + outText[2] + '' + outText[3]; //выводим исправленное сообщение
+					}else document.getElementById('origMessage').value = outText[0] + '1' + outText[2] + '' + outText[3]; //если символ стал 0 - выводим исправленное сообщение
+					document.getElementById('placeHolder').innerText = 'error in position 2'; //пишем в котором символе была ошибка
+				}else if (errorIn == 6){ //если ошибка была в первом символе сообщения
+					if (outText[0]){ //если символ стал 1
+						document.getElementById('origMessage').value = '0' + outText[1] + '' + outText[2] + '' + outText[3]; //выводим исправленное сообщение
+					}else document.getElementById('origMessage').value = '1' + outText[1] + '' + outText[2] + '' + outText[3]; //если символ стал 0 - выводим исправленное сообщение
+					document.getElementById('placeHolder').innerText = 'error in position 1'; //пишем в котором символе была ошибка
+				}else if (errorIn == 7){ //если ошибка была в третьем символе сообщения
+					if (outText[2]){ //если символ стал 1
+						document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '0' + outText[3]; //выводим исправленное сообщение
+					}else document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '1' + outText[3]; //если символ стал 0 - выводим исправленное сообщение
+					document.getElementById('placeHolder').innerText = 'error in position 3'; //пишем в котором символе была ошибка
+				}else{ //если ошибка была в четвертом символе сообщения
+					if (outText[3]){ //если символ стал 1
+						document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '' + outText[2] + '0'; //выводим исправленное сообщение
+					}else document.getElementById('origMessage').value = outText[0] + '' + outText[1] + '' + outText[2] + '1'; //если символ стал 0 - выводим исправленное сообщение
+					document.getElementById('placeHolder').innerText = 'error in position 4'; //пишем в котором символе была ошибка
+				}
+			}
+		</script>
+	</head>
+	<body>
+	<h1>Russkova, Hemming code</h1>
+	<p><input type = 'text' id = 'inpMessage' /> input message, 4 bits </p>
+	</p><input type = 'button' value = 'code' onclick = 'code()' />  </p>
+	<p><input type = 'text' id = 'outMessage' /> coded message </p>
+	</p><input type = 'button' value = 'check' onclick = 'decode()' />  </p>
+	<p><input type = 'text' id = 'origMessage' /> original message </p>
+	<p id = 'placeHolder'></p>
+	</body>
+</html>
