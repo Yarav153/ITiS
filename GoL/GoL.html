@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Game of Life</title>
+	<body>
+		<header><input type = 'button' onclick = 'doOneStep()' value = 'one step'>
+		<input type = 'button' onclick = 'startPauseGame()' value = 'run/pause'>
+		<input type = 'button' onclick = 'restartGame()' value = 'restart'>
+		<input type = 'text' id = 'inpSpeed' value = 'write speed in ms'>
+		<input type = 'button' onclick = 'changeSpeed()' value = 'change speed'></header>
+		<canvas id="myCanvas" width="900" height="900" style="border:5px solid grey; background-color: #1E1E1E"></canvas>
+		<script>
+			const fieldSize = 45;
+			const cellSize = 20;
+			const canvas = document.getElementById("myCanvas");
+			const ctx = canvas.getContext("2d");
+			
+			let field = new Array(fieldSize); //текущее состояние поля
+			for(let i = 0; i < fieldSize; i++){
+				field[i] = new Array(fieldSize);
+			}
+			
+			let nextField = new Array(fieldSize); //следующее состояние поля
+			for(let i = 0; i < fieldSize; i++){
+				nextField[i] = new Array(fieldSize);
+			}
+			
+			function neighbourCount(row, collumn){ //считаем количество соседей клетки
+				let count = -field[row][collumn];
+				for(let i = -1; i <= 1; i++)
+					for(let j = -1; j <= 1; j++)
+						count += field[(row + i + fieldSize)%fieldSize][(collumn + j + fieldSize)%fieldSize];
+				return count;
+			}
+			
+			function nextGen(){ //определяем следующее состояние поля
+				for(let i = 0; i < fieldSize; i++){
+					for(let j = 0; j < fieldSize; j++){
+						nextField[i][j] = field[i][j];
+						if((field[i][j] == 0) && (neighbourCount(i,j) == 3)){
+							nextField[i][j] = 1;
+						}else if((field[i][j] == 1) && ((neighbourCount(i,j) < 2) || (neighbourCount(i,j) > 3))){
+							nextField[i][j] = 0;
+						}
+					}
+				}
+			}
+			
+			for(let i = 0; i < fieldSize; i++){ //первое состояние поля
+				for(let j = 0; j < fieldSize; j++){
+					field[i][j] = (Math.random() > 0.9) * 1;
+				}
+			}
+			
+			function doStep(){ //смена состояния поля
+				for(let i = 0; i < fieldSize; i++){
+					for(let j = 0; j < fieldSize; j++){
+						if (field[i][j] == 1){
+							ctx.fillStyle = "#FCE300"; //живая клетка
+							ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+						}else{
+							ctx.fillStyle = "#1E1E1E"; //мертвая клетка
+							ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+						}
+					}
+				}
+				nextGen();
+				for(let i = 0; i < fieldSize; i++){
+					for(let j = 0; j < fieldSize; j++){
+						field[i][j] = nextField[i][j];
+					}
+				}
+			}
+			
+			for(let i = 0; i < fieldSize; i++){ //первое состояние поля
+				for(let j = 0; j < fieldSize; j++){
+					field[i][j] = (Math.random() > 0.9) * 1;
+				}
+			}
+			
+			let timer;
+			let speed = 500;
+			
+			function startPauseGame(){ //запуск или пауза игры
+				if (!timer){
+					timer = setInterval(doStep, speed);
+				}else{
+					clearInterval(timer);
+					timer = null;
+				}
+			}
+			
+			function doOneStep(){ //один шаг
+				if (timer){
+					clearInterval(timer);
+					timer = null;
+				}
+				doStep();
+			}
+			
+			function restartGame(){ //перезапуск поля
+				for(let i = 0; i < fieldSize; i++){ 
+					for(let j = 0; j < fieldSize; j++){
+						field[i][j] = (Math.random() > 0.9) * 1;
+					}
+				}
+				doStep();
+			}
+			
+			function changeSpeed(){
+				speed = document.getElementById('inpSpeed').value;
+				if (timer){
+					startPauseGame();
+					startPauseGame();
+				}
+			}
+		</script>
+	</body>
+</html>
