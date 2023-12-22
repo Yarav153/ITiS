@@ -1,0 +1,6 @@
+input 18
+input 19
+mul 20 18 19
+nod 21 18 19
+div 22 20 21
+output 22

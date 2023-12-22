@@ -1,0 +1,13 @@
+input 41
+set 42 5
+sqrt 43 42
+set 44 1
+set 45 2
+add 46 43 44
+div 47 46 45
+pow 48 47 41
+div 49 48 43
+set 50 0.5
+add 51 49 50
+int 51
+output 51
